@@ -25,7 +25,7 @@ jobs:
               uses: hashicorp/setup-terrform@v2
               with:
                   terraform_version: 1.9.8
-                  terrafiorm_wrapper: false
+                  terraform_wrapper: false
             - name: Create SSH Keys from secrets
               run: |
                   mkdir keys
