@@ -26,6 +26,7 @@ jobs:
               with:
                   terraform_version: 1.9.8
                   terraform_wrapper: false
+
             - name: Create SSH Keys from secrets
               run: |
                   mkdir keys
@@ -47,4 +48,4 @@ jobs:
                 run: terraform plan
 
               - name: Terraform apply
-                run: terraform apply
+                run: terraform apply --auto-approve
