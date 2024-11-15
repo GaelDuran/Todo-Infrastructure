@@ -1,41 +1,41 @@
-    provider "digitalocean" {
+provider "digitalocean" {
     token = var.DO_TOKEN
-    }
+}
     
-    terraform {
-    required_providers {
-        digitalocean = {
-            source = "digitalocean/digitalocean"
-            version = "~> 2.0"
-        }
+terraform {
+required_providers {
+    digitalocean = {
+        source = "digitalocean/digitalocean"
+        version = "~> 2.0"
     }
+}
 
-    backend "s3"{
-        endpoints = {
-            s3 = "https://sfo3.digitaloceanspaces.com"
-        }
-        bucket = "devlgdt"
-        key = "terraform.tfstate"
-        skip_credentials_validation = true
-        skip_requesting_account_id = true
-        skip_metadata_api_check = true
-        skip_s3_checksum = true
-        region = "us-east-1"
+backend "s3"{
+    endpoints = {
+        s3 = "https://sfo3.digitaloceanspaces.com"
+    }
+    bucket = "devlgdt"
+    key = "terraform.tfstate"
+    skip_credentials_validation = true
+    skip_requesting_account_id = true
+    skip_metadata_api_check = true
+    skip_s3_checksum = true
+    region = "us-east-1"
     } 
 }
     
-    resource "digitalocean_project" "gael_server_project" {
+resource "digitalocean_project" "gael_server_project" {
     name="gael_server_project2"
     description = "Un servidor para cositas personales"
     resources = [ digitalocean_droplet.gael_server_droplet.urn]
-    }
+}
     
-    resource "digitalocean_ssh_key" "gael_server_ssh_key" {
+resource "digitalocean_ssh_key" "gael_server_ssh_key" {
     name = "gael_server_key21"
     public_key = file("./keys/gael_server.pub")
-    }
+}
     
-    resource "digitalocean_droplet" "gael_server_droplet" {
+resource "digitalocean_droplet" "gael_server_droplet" {
     name = "gaelserver"
     size = "s-2vcpu-4gb-120gb-intel"
     image = "ubuntu-24-04-x64"
@@ -77,26 +77,26 @@
     }
     }
     
-    resource "time_sleep" "wait_docker_install" {
-        depends_on = [ digitalocean_droplet.gael_server_droplet ]
-        create_duration = "130s"
+resource "time_sleep" "wait_docker_install" {
+    depends_on = [ digitalocean_droplet.gael_server_droplet ]
+    create_duration = "130s"
     }
     
-    resource "null_resource" "init_api" {
-        depends_on = [ time_sleep.wait_docker_install ]
-        provisioner "remote-exec" {
-            inline = [
-                "cd /projects",
-                "docker-compose up -d"
-                ]
-            connection {
-                type = "ssh"
-                user = "root"
-                private_key = file("./keys/gael_server")
-                host = digitalocean_droplet.gael_server_droplet.ipv4_address
-            }
+resource "null_resource" "init_api" {
+    depends_on = [ time_sleep.wait_docker_install ]
+    provisioner "remote-exec" {
+        inline = [
+            "cd /projects",
+            "docker-compose up -d"
+            ]
+        connection {
+            type = "ssh"
+            user = "root"
+            private_key = file("./keys/gael_server")
+            host = digitalocean_droplet.gael_server_droplet.ipv4_address
         }
     }
+}
     
     # resource "null_resource" "init_nginx" {
     #   depends_on = [ time_sleep.wait_docker_install ]
