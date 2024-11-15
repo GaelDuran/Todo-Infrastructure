@@ -1,4 +1,4 @@
-name: Deploy Gael Durán
+name: Destroy Gael Durán
 
 on:
   workflow_dispatch:
